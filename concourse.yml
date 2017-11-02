@@ -259,7 +259,10 @@ instance_groups:
             - /var/vcap/store/bosh_exporter/bosh_target_groups.json
           job_name: mongodb
           relabel_configs:
-          - action: keep
+          - -l
+
+
+\action: keep
             regex: mongodb_exporter
             source_labels:
             - __meta_bosh_job_process_name
