@@ -1,0 +1,74 @@
+---
+jobs:
+- name: deploy-prometheus-to-test
+  public: false
+  serial: true
+  plan:
+  - aggregate:
+    - get: Deployment-Prometheus
+      trigger: true
+    - get: stemcell
+      trigger: true
+    - get: prometheus-boshrelease
+      trigger: true
+  - put: deploy-to-test
+    params:
+      manifest: Deployment-Prometheus/prometheus.yml
+      stemcells:
+      - stemcell/stemcell.tgz
+      releases:
+      - prometheus-boshrelease/release.tgz
+
+resource_types:
+- name: bosh-deployment
+  type: docker-image
+  source:
+    repository: cloudfoundry/bosh-deployment-resource
+
+resources:
+- name: Deployment-Prometheus
+  type: git
+  source:
+    uri: https://github.com/freekbrouwer/freek.git
+    
+- name: deploy-to-test
+  type: bosh-deployment
+  source:
+    deployment: prometheus
+    target: 192.168.2.253
+    client: admin
+    client_secret: 5az8702ovfjlhzu2fkv7
+    ca_cert: |
+      -----BEGIN CERTIFICATE-----
+      MIIEEzCCAnugAwIBAgIQdgK8s8gqwaPtcf0i5KqnHjANBgkqhkiG9w0BAQsFADAz
+      MQwwCgYDVQQGEwNVU0ExFjAUBgNVBAoTDUNsb3VkIEZvdW5kcnkxCzAJBgNVBAMT
+      AmNhMB4XDTE3MTAzMDEwNDQwMloXDTE4MTAzMDEwNDQwMlowMzEMMAoGA1UEBhMD
+      VVNBMRYwFAYDVQQKEw1DbG91ZCBGb3VuZHJ5MQswCQYDVQQDEwJjYTCCAaIwDQYJ
+      KoZIhvcNAQEBBQADggGPADCCAYoCggGBAL6O421W38QErPNZi2KnxJSE68aWWZo+
+      ZSy7WX55p+kmfIXChTk4qIngnjBYCjMHqbNKEbjaomPFmgY9c5/1nguhgNKftwOG
+      Alq23+1f+poHQIRKlfVkhItm4Yo4628cDiyVWf786+Hb1MIHHCR1AQFj83trh0sm
+      zM1zKhqajQGwKw8y+YBbAq9DYxU+HN1XCATTXnxxn3LI4qZGnV7ObM8RaTrQ5Y/s
+      EJRJWrzGM7RbFAKjxAHLYLXMuGQ7g03+LSs7qIhygR9jo9T+zRzj0OZOnJ1J2MPg
+      xEo062rzrG7pVhrnumgbOUsG06TrwthXvVH3zMae+hT5Z0uefw8D/bzZFNmonplj
+      bVsPtKMtPlwuTU7mh1sPHQVP2tlqji1JL3AS29nRzFqne7H03Sdby4jiFElcdh5R
+      K1U5v/lYdVmwDpabcZ9NVExp7+2E/B8wycdEfgIlK5w8ZA/ddkVXMhNSA/iNFNoM
+      zpbsVieIpVnhzNvbHuqxmlT1d6Cu7gBxowIDAQABoyMwITAOBgNVHQ8BAf8EBAMC
+      AQYwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAYEArZset1dktr+6
+      Tg2IReI+q+ZqX5xcalmvkv7hF+7NAcQWHOnXx9A5yrdeoDX0+1eTMVJo59h9Ju52
+      WQwD4j36f74rbrWW9iI1T1IYi+vCj+CMSvlni1vJhhjbIeQjtMWDfFNuPOWYtlZa
+      CQEg7eNPs68I0iW0HlBNNPfDl8Wun+cdCkL0IqxeXmhmioNZJEqsxXaOTTEh99Ul
+      RtKEIsjx71rwsuuOh640gHGuCQJpfGscvY8+P90XtgA3kNsogQB6+z5jRS8Dg+v7
+      2GsX9PWG19J8TvclZ+KamML5P5NuNSadgZE5sXGjxmPjadWQtldWh5q8ZribkRHD
+      x+09DuWL4f1c7JFkkKPUwOasBXEXXCIpHVsqubtE1Cpt7rSZOcTupuzJYeX2/XXp
+      1PrEqtVs6S01QjDri9qwd0TlI58zCw2/WnMCaQBx1Edf4HSeTjnkYpUUaqcQQ75e
+      x4Ynm3UIgePVTyFQzYxW67YLUZ+UxCzbVg1OMFjD82x0AdGkFKsC
+      -----END CERTIFICATE-----
+    
+- name: prometheus-boshrelease
+  type: bosh-io-release
+  source:
+    repository: cloudfoundry-community/prometheus-boshrelease
+- name: stemcell
+  type: bosh-io-stemcell
+  source:
+    name: bosh-vsphere-esxi-ubuntu-trusty-go_agent
